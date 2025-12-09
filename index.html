@@ -70,48 +70,42 @@
             }
         }
 
-        // --- 2. QR Code Scanner Logic (from your article) ---
+// --- 2. Improved QR Code Scanner Logic ---
+    
+    function onScanSuccess(decodedText, decodedResult) {
+        // Stop scanning after success
+        html5QrcodeScanner.clear();
         
-        // This function runs when a code is successfully scanned
-        function onScanSuccess(decodedText, decodedResult) {
-            // Handle the result
-            console.log(`Scan result: ${decodedText}`, decodedResult);
-            
-            // Visual feedback
-            document.getElementById('scanResult').innerText = "掃瞄成功！正在跳轉...";
+        // Visual feedback
+        document.getElementById('scanResult').innerText = "✅ 掃瞄成功！";
 
-            // Stop the scanner to save battery/resources
-            html5QrcodeScanner.clear();
+        // Logic to redirect
+        if (decodedText.includes("question.html")) {
+            window.location.href = decodedText; 
+        } else {
+            window.location.href = 'question.html?id=' + decodedText;
+        }
+    }
 
-            // Check if the scanned text is a URL or just an ID
-            if (decodedText.includes("question.html")) {
-                // If it's a full URL (e.g., https://site.com/question.html?id=001)
-                window.location.href = decodedText; 
-            } else {
-                // If the QR code ONLY contains the number (e.g., "001")
-                // We assume it's an ID and redirect manually
-                window.location.href = 'question.html?id=' + decodedText;
+    function onScanFailure(error) {
+        // Keeps the console clean, ignore failures
+    }
+
+    // Initialize with specific settings for Mobile
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", 
+        { 
+            fps: 10, 
+            qrbox: { width: 250, height: 250 },
+            // Important: Prefer the back camera
+            videoConstraints: {
+                facingMode: { exact: "environment" }
             }
-        }
-
-        function onScanError(errorMessage) {
-            // handle on error condition, with error message
-            // We usually ignore this because it triggers on every frame it DOESN'T see a code
-            // console.warn(`Code scan error = ${errorMessage}`);
-        }
-
-        // Initialize the Scanner
-        // 'reader' matches the id of our div
-        const html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", 
-            { 
-                fps: 10,       // Frames per second (lower = less battery usage)
-                qrbox: { width: 250, height: 250 } // Size of the scanning box
-            },
-            /* verbose= */ false
-        );
-        
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
+        },
+        /* verbose= */ false
+    );
+    
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
     </script>
 </body>

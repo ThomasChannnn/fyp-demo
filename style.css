@@ -144,3 +144,38 @@ audio {
 /* Utilities */
 .text-center { text-align: center; }
 .mt-2 { margin-top: 20px; }
+
+/* --- QR Scanner Customization --- */
+
+#reader {
+    background-color: #000000; /* Black background for video */
+    border-radius: 8px;
+    padding: 10px;
+    color: #ffffff; /* Make default text WHITE */
+}
+
+/* Fix the status text (e.g., "Requesting permission...") */
+#reader__status_span {
+    color: #ffffff !important; 
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Fix the 'Request Camera Permission' button */
+#reader__dashboard_section_csr button {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: 2px solid white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Hide the "Scan an Image File" link if you don't want it */
+#reader__dashboard_section_swaplink {
+    display: none !important; 
+}
