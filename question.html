@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>題目頁面</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html">⬅️ 返回首頁 (Back)</a>
+    </header>
+
+    <main class="container">
+
+        <div class="card text-center">
+            <h1 id="display-id">題目載入中...</h1>
+            <h3 id="display-topic" style="color: #666; font-weight: normal;"></h3>
+            <p>請細心聆聽旋律並參考樂譜</p>
+        </div>
+
+        <section class="card">
+            <span class="label-text">🎵 樂譜 (Music Score)</span>
+            <img id="img-score" src="" alt="Music Score" class="score-image" style="min-height: 200px; background: #eee;">
+            <p id="error-msg" class="text-center" style="color: red; display: none;">找不到此題目的資料</p>
+        </section>
+
+        <section class="card" id="audio-section">
+            <div class="audio-player-wrapper">
+                <span class="label-text">🎹 主旋律 (Melody)</span>
+                <audio id="audio-melody" controls>
+                    <source src="" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+            <div class="audio-player-wrapper">
+                <span class="label-text">🥁 純音樂/伴奏 (Backing Track)</span>
+                <audio id="audio-backing" controls>
+                    <source src="" type="audio/mpeg">
+                </audio>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ---------------------------------------------------------
+        // 1. THE DATABASE (Add your questions here!)
+        // ---------------------------------------------------------
+        const songDatabase = {
+            "001": {
+                topic: "題目範例：兒歌",
+                image: "score_001.png",     // File name of the image
+                melody: "melody_001.mp3",   // File name of melody
+                backing: "backing_001.mp3"  // File name of backing
+            },
+            "002": {
+                topic: "題目範例：流行曲",
+                image: "score_002.png",
+                melody: "melody_002.mp3",
+                backing: "backing_002.mp3"
+            },
+            "003": {
+                topic: "題目範例：經典金曲",
+                image: "score_003.png",
+                melody: "melody_003.mp3",
+                backing: "backing_003.mp3"
+            }
+            // To add more, just copy the block above, change ID to "004", and update filenames.
+        };
+
+        // ---------------------------------------------------------
+        // 2. THE LOGIC (Do not change this unless necessary)
+        // ---------------------------------------------------------
+        
+        // Get the ID from the URL (e.g., question.html?id=001)
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentId = urlParams.get('id');
+
+        // Grab HTML elements
+        const titleEl = document.getElementById('display-id');
+        const topicEl = document.getElementById('display-topic');
+        const imgEl = document.getElementById('img-score');
+        const melodyEl = document.getElementById('audio-melody');
+        const backingEl = document.getElementById('audio-backing');
+        const errorMsg = document.getElementById('error-msg');
+        const audioSection = document.getElementById('audio-section');
+
+        // Check if the ID exists in our database
+        if (currentId && songDatabase[currentId]) {
+            const data = songDatabase[currentId];
+
+            // Update Text
+            titleEl.innerText = "題目編號 #" + currentId;
+            topicEl.innerText = data.topic;
+
+            // Update Image Path (Assuming images are in an 'assets' folder)
+            imgEl.src = "assets/" + data.image;
+
+            // Update Audio Paths (Assuming audio is in an 'assets' folder)
+            melodyEl.src = "assets/" + data.melody;
+            backingEl.src = "assets/" + data.backing;
+            
+            // Reload audio players to ensure new source is ready
+            melodyEl.load();
+            backingEl.load();
+
+        } else {
+            // Error State: ID not found
+            titleEl.innerText = "找不到題目";
+            imgEl.style.display = 'none';
+            audioSection.style.display = 'none';
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = "編號 #" + (currentId || "未知") + " 不存在於資料庫中。";
+        }
+    </script>
+</body>
+</html>
