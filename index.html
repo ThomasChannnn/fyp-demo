@@ -5,22 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>廣東歌填詞大賽 - 首頁</title>
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <style>
-        /* Specific styles for the scanner to look good on mobile */
-        #reader {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-        }
-        /* Hide the annoying 'Scan an Image File' link if you only want camera */
-        #reader__dashboard_section_csr span {
-            display: none !important;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -31,82 +16,110 @@
     <main class="container">
         
         <section class="card">
-            <h3>🔤 輸入題目</h3>
+            <h2>📜 遊戲規則</h2>
+            <ul style="padding-left: 20px;">
+                <li>抽取一張<strong>旋律卡</strong>。</li>
+                <li>掃瞄 QR Code 或輸入編號。</li>
+                <li>聆聽旋律並填詞。</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h3>搜尋題目</h3>
+            
             <div class="input-group">
                 <input type="text" placeholder="輸入編號 (例如: 001)" id="questionInput">
                 <button class="btn btn-primary" onclick="goToQuestionManual()">確認前往</button>
             </div>
-        </section>
 
-        <section class="card">
-            <h3>📷 掃瞄 QR Code</h3>
-            <p style="margin-bottom: 10px; font-size: 0.9rem; color: #666;">請允許使用相機權限</p>
-            
-            <div id="reader"></div>
-            
-            <div id="scanResult" class="text-center" style="margin-top: 10px; font-weight: bold; color: green;"></div>
-        </section>
+            <div class="text-center" style="margin: 15px 0; color: #aaa;">—— 或 ——</div>
 
-        <section class="card">
-            <h2>📜 遊戲規則</h2>
-            <ul style="padding-left: 20px;">
-                <li>抽取一張<strong>旋律卡</strong>。</li>
-                <li>掃瞄卡上的 QR Code。</li>
-                <li>聆聽旋律，並根據<strong>題目卡</strong>的主題填寫歌詞。</li>
-            </ul>
+            <button class="btn btn-secondary" onclick="openScanner()">
+                📷 開啟相機掃瞄 QR Code
+            </button>
         </section>
 
     </main>
 
+    <div id="scannerModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeScanner()">&times;</button>
+            <h3>掃瞄 QR Code</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">請將 QR Code 對準鏡頭</p>
+            
+            <div id="reader"></div>
+            
+            <p id="scanStatus" style="margin-top:10px; font-weight:bold; color:var(--primary-color)"></p>
+        </div>
+    </div>
+
     <script>
-        // --- 1. Manual Input Logic ---
+        // Global variable to store the scanner instance
+        let html5QrcodeScanner = null;
+
+        // --- 1. Manual Navigation ---
         function goToQuestionManual() {
             const input = document.getElementById('questionInput').value;
-            if(input) {
-                // Redirect to question page
-                window.location.href = 'question.html?id=' + input;
+            if(input) window.location.href = 'question.html?id=' + input;
+            else alert("請輸入編號！");
+        }
+
+        // --- 2. Open Modal & Start Camera ---
+        function openScanner() {
+            // Show the modal
+            document.getElementById('scannerModal').style.display = 'flex';
+            document.getElementById('scanStatus').innerText = "啟動相機中...";
+
+            // Initialize Scanner
+            // We use a small timeout to let the modal animation finish effectively
+            setTimeout(() => {
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", 
+                    { 
+                        fps: 10, 
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    false
+                );
+                
+                // Start rendering the camera
+                html5QrcodeScanner.render(onScanSuccess, onScanError);
+                document.getElementById('scanStatus').innerText = "正在掃瞄...";
+            }, 100);
+        }
+
+        // --- 3. Close Modal & Stop Camera ---
+        function closeScanner() {
+            // Hide the modal
+            document.getElementById('scannerModal').style.display = 'none';
+
+            // Stop the camera to save battery
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().then(() => {
+                    console.log("Camera stopped.");
+                }).catch(error => {
+                    console.error("Failed to clear scanner. ", error);
+                });
+            }
+        }
+
+        // --- 4. Success Logic ---
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('scanStatus').innerText = "✅ 成功！跳轉中...";
+            
+            // Stop scanning immediately so it doesn't scan twice
+            html5QrcodeScanner.clear();
+
+            if (decodedText.includes("question.html")) {
+                window.location.href = decodedText; 
             } else {
-                alert("請輸入編號！");
+                window.location.href = 'question.html?id=' + decodedText;
             }
         }
 
-// --- 2. Improved QR Code Scanner Logic ---
-    
-    function onScanSuccess(decodedText, decodedResult) {
-        // Stop scanning after success
-        html5QrcodeScanner.clear();
-        
-        // Visual feedback
-        document.getElementById('scanResult').innerText = "✅ 掃瞄成功！";
-
-        // Logic to redirect
-        if (decodedText.includes("question.html")) {
-            window.location.href = decodedText; 
-        } else {
-            window.location.href = 'question.html?id=' + decodedText;
+        function onScanError(errorMessage) {
+            // Ignore errors (scanning empty space)
         }
-    }
-
-    function onScanFailure(error) {
-        // Keeps the console clean, ignore failures
-    }
-
-    // Initialize with specific settings for Mobile
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", 
-        { 
-            fps: 10, 
-            qrbox: { width: 250, height: 250 },
-            // Important: Prefer the back camera
-            videoConstraints: {
-                facingMode: { exact: "environment" }
-            }
-        },
-        /* verbose= */ false
-    );
-    
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
     </script>
 </body>
 </html>

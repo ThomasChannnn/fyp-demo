@@ -179,3 +179,49 @@ audio {
 #reader__dashboard_section_swaplink {
     display: none !important; 
 }
+
+/* --- Pop-up Modal Styles --- */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark dimmed background */
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    text-align: center;
+}
+
+/* Close Button (X) */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+/* Scanner Box inside Modal */
+#reader {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 10px;
+    background: black; /* Prevent white flash before camera loads */
+}
