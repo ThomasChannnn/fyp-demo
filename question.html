@@ -3,8 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>題目頁面</title>
+    <title>題目頁面 - 廣東歌填詞大賽</title>
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* 0243 Game Styles */
+        .tone-section {
+            background-color: #FFF8E1; 
+            border: 2px dashed #FFC107;
+            text-align: center;
+        }
+        .tone-answer-box {
+            margin-top: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: #4A90E2;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+        }
+        .btn-reveal {
+            background-color: #FFC107;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        /* Source Text Style */
+        .source-text {
+            font-size: 0.85rem;
+            color: #888;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
 
@@ -16,14 +50,24 @@
 
         <div class="card text-center">
             <h1 id="display-id">題目載入中...</h1>
-            <h3 id="display-topic" style="color: #666; font-weight: normal;"></h3>
-            <p>請細心聆聽旋律並參考樂譜</p>
         </div>
+
+        <section class="card tone-section">
+            <h3>🎁 0243填詞大法</h3>
+            <p style="color: #666; font-size: 0.9rem;">估埋對應嘅「0243」！</p>
+            
+            <button class="btn btn-reveal" onclick="showAnswer()">👀 答案</button>
+            
+            <div id="tone-answer-display" class="tone-answer-box">
+                </div>
+        </section>
 
         <section class="card">
             <span class="label-text">🎵 樂譜 (Music Score)</span>
+            
             <img id="img-score" src="" alt="Music Score" class="score-image" style="min-height: 200px; background: #eee;">
-            <p id="error-msg" class="text-center" style="color: red; display: none;">找不到此題目的資料</p>
+            
+            <p id="display-source" class="source-text"></p>
         </section>
 
         <section class="card" id="audio-section">
@@ -48,73 +92,135 @@
 
     <script>
         // ---------------------------------------------------------
-        // 1. THE DATABASE (Add your questions here!)
+        // 1. THE DATABASE
         // ---------------------------------------------------------
         const songDatabase = {
             "001": {
-                topic: "題目範例：兒歌",
-                image: "score_001.png",     // File name of the image
-                melody: "melody_001.mp3",   // File name of melody
-                backing: "backing_001.mp3"  // File name of backing
+                source: "歌曲來源：Old MacDonald Had a Farm",
+                tone_answer: "4-4-4-0-2-2-0",
+                image: "score/001.png",
+                melody: "melody/001.mp3",
+                backing: "backing/001.mp3"
             },
             "002": {
-                topic: "題目範例：流行曲",
-                image: "score_002.png",
-                melody: "melody_002.mp3",
-                backing: "backing_002.mp3"
+                source: "歌曲來源：Twinkle Twinkle Little Star",
+                tone_answer: "0-0-4-4-3-3-4",
+                image: "score/002.png",
+                melody: "melody/002.mp3",
+                backing: "backing/002.mp3"
             },
             "003": {
-                topic: "題目範例：經典金曲",
-                image: "score_003.png",
-                melody: "melody_003.mp3",
-                backing: "backing_003.mp3"
+                source: "歌曲來源：London Bridge is Falling Down",
+                tone_answer: "4-3-3-4-2-4-3",
+                image: "score/003.png",
+                melody: "melody/003.mp3",
+                backing: "backing/003.mp3"
+            },
+            "004": {
+                source: "歌曲來源：Happy Birthday to You",
+                tone_answer: "0-0-2-0-4-2",
+                image: "score/004.png",
+                melody: "melody/004.mp3",
+                backing: "backing/004.mp3"
+            },
+            "005": {
+                source: "歌曲來源：We Wish You a Merry Christmas",
+                tone_answer: "0-4-4-3-4-2-0-0",
+                image: "score/005.png",
+                melody: "melody/005.mp3",
+                backing: "backing/005.mp3"
+            },
+            "006": {
+                source: "歌曲來源：Jungle Bells",
+                tone_answer: "2-2-2-2-2-2-2-3-0-0-2",
+                image: "score/006.png",
+                melody: "melody/006.mp3",
+                backing: "backing/006.mp3"
+            },
+            "007": {
+                source: "歌曲來源：多啦A夢",
+                tone_answer: "0-4-4-2-3-2-4",
+                image: "score/007.png",
+                melody: "melody/007.mp3",
+                backing: "backing/007.mp3"
+            },
+            "008": {
+                source: "歌曲來源：It's a Small World",
+                tone_answer: "4-4-3-4-3-3-3",
+                image: "score/008.png",
+                melody: "melody/008.mp3",
+                backing: "backing/008.mp3"
+            },
+            "009": {
+                source: "歌曲來源：Lonely Christmas",
+                tone_answer: "2-4-2-4-4-3",
+                image: "score/009.png",
+                melody: "melody/009.mp3",
+                backing: "backing/009.mp3"
+            },
+            "010": {
+                source: "歌曲來源：Greensleeves",
+                tone_answer: "0-4-4-3-3-3-4-2-0",
+                image: "score/010.png",
+                melody: "melody/010.mp3",
+                backing: "backing/010.mp3"
             }
-            // To add more, just copy the block above, change ID to "004", and update filenames.
         };
 
         // ---------------------------------------------------------
-        // 2. THE LOGIC (Do not change this unless necessary)
+        // 2. PAGE LOGIC
         // ---------------------------------------------------------
         
-        // Get the ID from the URL (e.g., question.html?id=001)
+        // Get ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const currentId = urlParams.get('id');
 
-        // Grab HTML elements
+        // Grab Elements
         const titleEl = document.getElementById('display-id');
-        const topicEl = document.getElementById('display-topic');
+        const sourceEl = document.getElementById('display-source');
+        const toneAnswerEl = document.getElementById('tone-answer-display');
         const imgEl = document.getElementById('img-score');
         const melodyEl = document.getElementById('audio-melody');
         const backingEl = document.getElementById('audio-backing');
-        const errorMsg = document.getElementById('error-msg');
-        const audioSection = document.getElementById('audio-section');
 
-        // Check if the ID exists in our database
+        // Check ID and Render
         if (currentId && songDatabase[currentId]) {
             const data = songDatabase[currentId];
+            console.log("Loading Question:", currentId);
 
-            // Update Text
+            // 1. Text Info
             titleEl.innerText = "題目編號 #" + currentId;
-            topicEl.innerText = data.topic;
+            sourceEl.innerText = data.source;
+            toneAnswerEl.innerText = data.tone_answer;
 
-            // Update Image Path (Assuming images are in an 'assets' folder)
-            imgEl.src = "assets/" + data.image;
-
-            // Update Audio Paths (Assuming audio is in an 'assets' folder)
-            melodyEl.src = "assets/" + data.melody;
-            backingEl.src = "assets/" + data.backing;
+            // 2. Media Paths (Assuming everything is in 'assets' folder)
+            imgEl.src = "assets/" + data.image;       // e.g. assets/score/001.png
+            melodyEl.src = "assets/" + data.melody;   // e.g. assets/melody/001.mp3
+            backingEl.src = "assets/" + data.backing; // e.g. assets/backing/001.mp3
             
-            // Reload audio players to ensure new source is ready
+            // 3. Refresh Audio
             melodyEl.load();
             backingEl.load();
 
         } else {
-            // Error State: ID not found
-            titleEl.innerText = "找不到題目";
-            imgEl.style.display = 'none';
-            audioSection.style.display = 'none';
-            errorMsg.style.display = 'block';
-            errorMsg.innerText = "編號 #" + (currentId || "未知") + " 不存在於資料庫中。";
+            // Error Handling
+            titleEl.innerText = "題目不存在";
+            document.querySelector('.container').innerHTML = 
+                "<div class='card text-center'>" +
+                "<h1 style='color:red;'>❌ 找不到題目</h1>" +
+                "<p>編號 #" + (currentId || "Unknown") + " 不在資料庫中。</p>" +
+                "<a href='index.html' class='btn btn-primary'>返回首頁</a>" +
+                "</div>";
+        }
+
+        // Toggle Answer Visibility
+        function showAnswer() {
+            const box = document.getElementById('tone-answer-display');
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+            } else {
+                box.style.display = 'block';
+            }
         }
     </script>
 </body>

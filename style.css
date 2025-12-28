@@ -225,3 +225,39 @@ audio {
     margin-top: 10px;
     background: black; /* Prevent white flash before camera loads */
 }
+
+/* --- 0243 Bonus Game Styles --- */
+.tone-section {
+    background-color: #FFF8E1; /* Light yellow to make it stand out */
+    border: 2px dashed #FFC107;
+    text-align: center;
+}
+
+.tone-answer-box {
+    margin-top: 15px;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 5px;
+    color: var(--primary-color);
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    
+    /* Hide the answer initially */
+    display: none; 
+}
+
+.btn-reveal {
+    background-color: #FFC107; /* Amber color */
+    color: #333;
+    margin-top: 10px;
+}
+
+/* --- Source Text Style --- */
+.source-text {
+    font-size: 0.85rem;      /* Small size */
+    color: #999;             /* Grey color */
+    text-align: center;      /* Centered */
+    margin-top: 10px;        /* Space between image and text */
+    font-style: italic;      /* Italic looks better for citations */
+}
